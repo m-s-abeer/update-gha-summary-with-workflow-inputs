@@ -45,7 +45,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: msabeer/update-gha-input-params-in-summary@master
+      - uses: m-s-abeer/update-gha-summary-with-workflow-inputs@v1
 ```
 
 The action will automatically create a table in your workflow summary containing all workflow_dispatch input parameters and their values.
