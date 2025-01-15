@@ -1,0 +1,36 @@
+name: 'Update GHA Summary with Workflow Dispatch Input Params'
+description: 'Displays all GitHub Action workflow_dispatch input parameters in the summary as a formatted table'
+author: 'Mahmud Sajjad Abeer | https://github.com/m-s-abeer'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Summary with Workflow Dispatch Input Parameters
+      shell: bash
+      run: |
+        if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+          echo "# Workflow Input Parameters [Branch: $GITHUB_REF_NAME]" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-------|" >> $GITHUB_STEP_SUMMARY
+
+          # Get the event path from GitHub context
+          EVENT_PATH=${GITHUB_EVENT_PATH}
+
+          if [ -f "$EVENT_PATH" ]; then
+            # Extract inputs from workflow_dispatch event
+            inputs=$(jq -r '.inputs | to_entries | .[] | "| \(.key) | \(.value) |"' $EVENT_PATH)
+            if [ ! -z "$inputs" ]; then
+              echo "$inputs" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "No workflow_dispatch inputs found" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No workflow_dispatch event data found" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "No inputs found as it's not a workflow_dispatch event!" >> $GITHUB_STEP_SUMMARY
+        fi
+
+branding:
+  icon: 'table'
+  color: 'blue'
